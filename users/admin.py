@@ -1,6 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, UserProfile
+from .models import User, UserProfile, Wishlist, UserDocument
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'added_at')
+    search_fields = ('user__email', 'product__name')
+
+@admin.register(UserDocument)
+class UserDocumentAdmin(admin.ModelAdmin):
+    list_display = ('title', 'document_type', 'user', 'uploaded_at')
+    list_filter = ('document_type',)
+    search_fields = ('title', 'user__email')
 
 
 class UserProfileInline(admin.StackedInline):

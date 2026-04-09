@@ -63,14 +63,22 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     variants = serializers.SerializerMethodField()
+    related_products = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'slug', 'description', 'technical_specs',
-            'category', 'images', 'variants', 'is_active',
-            'meta_title', 'meta_description', 'created_at', 'updated_at',
+            'category', 'images', 'variants', 'related_products', 'is_active',
+            'meta_title', 'meta_description', 'meta_keywords', 'created_at', 'updated_at',
         ]
+
+    def get_related_products(self, obj):
+        related = Product.objects.filter(
+            category=obj.category, 
+            is_active=True
+        ).exclude(id=obj.id)[:4]
+        return ProductListSerializer(related, many=True, context=self.context).data
 
     def get_variants(self, obj):
         """Show prices only to authenticated users."""

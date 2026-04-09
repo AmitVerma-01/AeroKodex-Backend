@@ -134,14 +134,19 @@ class DashboardView(APIView):
         user = request.user
         from workshops.models import Booking
         from inquiries.models import QuoteRequest
+        from .models import Wishlist, UserDocument
 
         bookings_count = Booking.objects.filter(user=user).count()
         quotes_count = QuoteRequest.objects.filter(email=user.email).count()
+        wishlist_count = Wishlist.objects.filter(user=user).count()
+        documents = UserDocument.objects.filter(user=user).values('id', 'title', 'document_type', 'uploaded_at')
 
         return Response({
             "user": UserSerializer(user).data,
             "stats": {
                 "workshop_bookings": bookings_count,
                 "quote_requests": quotes_count,
+                "saved_products_wishlist": wishlist_count,
             },
+            "documents": list(documents)
         })
