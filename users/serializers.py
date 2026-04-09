@@ -4,6 +4,8 @@ import string
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.core.mail import send_mail
+from django.conf import settings
 
 from .models import User, UserProfile
 
@@ -38,9 +40,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Create profile
         UserProfile.objects.create(user=user)
 
-        # TODO: Send OTP via email/SMS
-        # For development, the OTP is printed to the console
         print(f"[DEV] OTP for {user.email}: {otp}")
+        send_mail(
+            subject="Welcome to AeroKodex - Verify Your Email",
+            message=f"Hi {user.username},\n\nYour OTP for email verification is: {otp}\n\nThanks,\nAeroKodex Team",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
 
         return user
 
@@ -111,8 +118,15 @@ class ResendOTPSerializer(serializers.Serializer):
         otp = ''.join(random.choices(string.digits, k=6))
         user.otp = otp
         user.save(update_fields=['otp'])
-        # TODO: Send OTP via email/SMS
+        
         print(f"[DEV] Resent OTP for {user.email}: {otp}")
+        send_mail(
+            subject="AeroKodex - Your new OTP",
+            message=f"Hi {user.username},\n\nYour new OTP for email verification is: {otp}\n\nThanks,\nAeroKodex Team",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
         return user
 
 
@@ -129,8 +143,15 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         otp = ''.join(random.choices(string.digits, k=6))
         user.otp = otp
         user.save(update_fields=['otp'])
-        # TODO: Send password reset OTP via email
+        
         print(f"[DEV] Password reset OTP for {user.email}: {otp}")
+        send_mail(
+            subject="AeroKodex - Password Reset Request",
+            message=f"Hi {user.username},\n\nYou requested a password reset. Your OTP is: {otp}\n\nIf you did not request this, please ignore this email.\n\nThanks,\nAeroKodex Team",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
         return user
 
 

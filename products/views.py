@@ -43,3 +43,9 @@ class ProductDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images', 'variants')
+
+    def get_object(self):
+        obj = super().get_object()
+        obj.views_count += 1
+        obj.save(update_fields=['views_count'])
+        return obj

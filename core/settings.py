@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_filters',
+    'drf_spectacular',
 
     # Local apps
     'products',
@@ -67,6 +68,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 ROOT_URLCONF = 'core.urls'
 
@@ -176,6 +180,18 @@ REST_FRAMEWORK = {
         'anon': '60/minute',
         'user': '120/minute',
     },
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# ---------------------------------------------------------------------------
+# API Documentation Configuration
+# ---------------------------------------------------------------------------
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'AeroKodex API',
+    'DESCRIPTION': 'API documentation for AeroKodex specialized backend.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 

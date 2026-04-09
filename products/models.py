@@ -16,6 +16,7 @@ class Product(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField()
     technical_specs = models.JSONField(default=dict, help_text="Store technical specs as key-value pairs")
+    views_count = models.PositiveIntegerField(default=0, help_text="Tracks popular products")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
