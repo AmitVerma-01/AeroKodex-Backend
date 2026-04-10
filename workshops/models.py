@@ -16,10 +16,15 @@ class Workshop(models.Model):
         ('Intermediate', 'Intermediate'),
         ('Advanced', 'Advanced'),
     ]
+    LEVEL_CHOICES = [
+        ('junior', 'Junior (Class 4-8)'),
+        ('senior', 'Senior (Class 9-12)'),
+    ]
 
     category = models.ForeignKey(WorkshopCategory, related_name='workshops', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='junior')
     description = models.TextField()
     duration = models.CharField(max_length=50, help_text="e.g. 2 Weeks, 3 Days")
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)

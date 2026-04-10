@@ -32,6 +32,7 @@ class WorkshopListView(generics.ListAPIView):
     filterset_fields = {
         'category__slug': ['exact'],
         'difficulty': ['exact'],
+        'level': ['exact'],
     }
     search_fields = ['title', 'description']
     ordering_fields = ['date', 'title']

@@ -20,7 +20,7 @@ class WorkshopListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workshop
         fields = [
-            'id', 'title', 'slug', 'description', 'category',
+            'id', 'title', 'slug', 'description', 'category', 'level',
             'duration', 'difficulty', 'date', 'location',
             'seats_available', 'total_seats', 'image',
             'is_active', 'is_fully_booked',
@@ -38,7 +38,7 @@ class WorkshopDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workshop
         fields = [
-            'id', 'title', 'slug', 'description', 'category',
+            'id', 'title', 'slug', 'description', 'category', 'level',
             'duration', 'difficulty', 'date', 'location',
             'price', 'seats_available', 'total_seats', 'image',
             'is_active', 'is_fully_booked',

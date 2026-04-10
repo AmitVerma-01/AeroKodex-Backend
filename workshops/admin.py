@@ -21,8 +21,8 @@ class ExportCsvMixin:
 
 @admin.register(Workshop)
 class WorkshopAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'difficulty', 'date', 'seats_available', 'is_active')
-    list_filter = ('category', 'difficulty', 'is_active')
+    list_display = ('title', 'category', 'level', 'difficulty', 'date', 'seats_available', 'is_active')
+    list_filter = ('category', 'level', 'difficulty', 'is_active')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
 
