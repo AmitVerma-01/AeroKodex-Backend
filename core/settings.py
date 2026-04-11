@@ -13,8 +13,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from urllib.parse import urlparse
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -179,6 +181,11 @@ if USE_CLOUDFLARE_R2:
     AWS_SECRET_ACCESS_KEY = os.environ.get('R2_SECRET_ACCESS_KEY', '')
     AWS_STORAGE_BUCKET_NAME = os.environ.get('R2_BUCKET_NAME', '')
     AWS_S3_ENDPOINT_URL = os.environ.get('R2_ENDPOINT_URL', '').rstrip('/')
+    if AWS_S3_ENDPOINT_URL.endswith('.r2.dev'):
+        raise ImproperlyConfigured(
+            'R2_ENDPOINT_URL must be the S3 API endpoint '
+            '(https://<accountid>.r2.cloudflarestorage.com), not the public r2.dev URL.'
+        )
     AWS_S3_REGION_NAME = os.environ.get('R2_REGION', 'auto')
     AWS_S3_SIGNATURE_VERSION = 's3v4'
     AWS_S3_ADDRESSING_STYLE = 'path'
@@ -197,6 +204,10 @@ if USE_CLOUDFLARE_R2:
 
     r2_public_url = os.environ.get('R2_PUBLIC_URL', '').rstrip('/')
     if r2_public_url:
+        parsed_public_url = urlparse(r2_public_url)
+        if parsed_public_url.scheme and parsed_public_url.netloc:
+            AWS_S3_CUSTOM_DOMAIN = parsed_public_url.netloc
+            AWS_S3_URL_PROTOCOL = f'{parsed_public_url.scheme}:'
         MEDIA_URL = f'{r2_public_url}/'
 
 # Default primary key field type
