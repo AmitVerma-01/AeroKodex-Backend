@@ -15,6 +15,7 @@ from pathlib import Path
 from datetime import timedelta
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -176,7 +177,7 @@ if USE_S3:
     AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
     AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', '')
     AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN', '')
-    AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', 'https://pub-2676f49f63d9409fb18f0ada3d3c95be.r2.dev')
+    AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', '')
     AWS_S3_ADDRESSING_STYLE = os.environ.get('AWS_S3_ADDRESSING_STYLE', 'path')
     AWS_S3_SIGNATURE_VERSION = os.environ.get('AWS_S3_SIGNATURE_VERSION', 's3v4')
     AWS_DEFAULT_ACL = None
@@ -190,12 +191,19 @@ if USE_S3:
 
     media_location = os.environ.get('AWS_MEDIA_LOCATION', 'media')
 
+    if AWS_S3_ENDPOINT_URL and AWS_S3_ENDPOINT_URL.endswith('.r2.dev'):
+        raise ImproperlyConfigured(
+            'AWS_S3_ENDPOINT_URL must be the R2 API endpoint (https://<account_id>.r2.cloudflarestorage.com). '
+            'Use your r2.dev/custom public host in AWS_S3_CUSTOM_DOMAIN instead.'
+        )
+
     STORAGES = {
         'default': {
             'BACKEND': 'storages.backends.s3.S3Storage',
             'OPTIONS': {
                 'bucket_name': AWS_STORAGE_BUCKET_NAME,
                 'location': media_location,
+                'endpoint_url': AWS_S3_ENDPOINT_URL or None,
                 'default_acl': AWS_DEFAULT_ACL,
                 'querystring_auth': AWS_QUERYSTRING_AUTH,
                 'file_overwrite': AWS_S3_FILE_OVERWRITE,
@@ -212,8 +220,11 @@ if USE_S3:
     if AWS_S3_CUSTOM_DOMAIN:
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{media_location}/'
     else:
-        endpoint = AWS_S3_ENDPOINT_URL or f'https://s3.amazonaws.com'
-        MEDIA_URL = f'{endpoint.rstrip("/")}/{AWS_STORAGE_BUCKET_NAME}/{media_location}/'
+        endpoint = AWS_S3_ENDPOINT_URL or 'https://s3.amazonaws.com'
+        if AWS_S3_ADDRESSING_STYLE == 'virtual':
+            MEDIA_URL = f'{endpoint.rstrip("/")}/{media_location}/'
+        else:
+            MEDIA_URL = f'{endpoint.rstrip("/")}/{AWS_STORAGE_BUCKET_NAME}/{media_location}/'
 
     MEDIA_ROOT = BASE_DIR / 'media'
 else:
