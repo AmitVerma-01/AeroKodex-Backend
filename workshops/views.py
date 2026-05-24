@@ -3,13 +3,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import WorkshopCategory, Workshop, Booking
+from .models import WorkshopCategory, Workshop, Booking, WorkshopGalleryImage
 from .serializers import (
     WorkshopCategorySerializer,
     WorkshopListSerializer,
     WorkshopDetailSerializer,
     BookingCreateSerializer,
     BookingListSerializer,
+    WorkshopGalleryImageSerializer,
 )
 
 
@@ -65,3 +66,22 @@ class UserBookingsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user).select_related('workshop')
+
+
+class WorkshopGalleryImageView(generics.ListAPIView):
+    """
+    List workshop gallery images.
+    Supports filtering by category: ?category__slug=<slug>
+    """
+    queryset = WorkshopGalleryImage.objects.all().select_related('category', 'workshop')
+    serializer_class = WorkshopGalleryImageSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = {
+        'category__slug': ['exact'],
+        'workshop__slug': ['exact'],
+        'is_featured': ['exact'],
+    }
+    search_fields = ['title', 'caption', 'workshop__title']
+    pagination_class = None
+

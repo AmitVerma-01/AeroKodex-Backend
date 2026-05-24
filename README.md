@@ -55,6 +55,27 @@ Install the required Python packages:
 pip install -r requirements.txt
 ```
 
+### Cloudflare R2 Setup (Images and Files)
+
+By default, uploads are saved to local `media/`. To store all `ImageField` and `FileField` uploads in Cloudflare R2, configure these environment variables in your `.env`:
+
+```bash
+USE_CLOUDFLARE_R2=True
+R2_ACCESS_KEY_ID=<your-r2-access-key-id>
+R2_SECRET_ACCESS_KEY=<your-r2-secret-access-key>
+R2_BUCKET_NAME=<your-bucket-name>
+R2_ENDPOINT_URL=https://<accountid>.r2.cloudflarestorage.com
+R2_REGION=auto
+
+# Recommended for public media URL generation
+R2_PUBLIC_URL=https://pub-<id>.r2.dev
+
+# Keep False for public buckets, True for private buckets (signed URLs)
+R2_QUERYSTRING_AUTH=False
+```
+
+Once enabled, existing model fields (for example project images, CMS images, inquiry attachments, and user documents) automatically use R2 via Django's default storage backend.
+
 ### 4. Database Migrations
 
 Apply the database migrations to set up your local PostgreSQL database schemas:

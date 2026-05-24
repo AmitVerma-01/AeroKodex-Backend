@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import WorkshopCategory, Workshop, Booking
+from .models import WorkshopCategory, Workshop, Booking, WorkshopGalleryImage
 
 
 class WorkshopCategorySerializer(serializers.ModelSerializer):
@@ -94,3 +94,18 @@ class BookingListSerializer(serializers.ModelSerializer):
             'id', 'workshop', 'workshop_title', 'workshop_date',
             'workshop_location', 'booked_at', 'payment_status',
         ]
+
+
+class WorkshopGalleryImageSerializer(serializers.ModelSerializer):
+    category_slug = serializers.CharField(source='category.slug', read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    workshop_title = serializers.CharField(source='workshop.title', read_only=True, default='')
+
+    class Meta:
+        model = WorkshopGalleryImage
+        fields = [
+            'id', 'title', 'workshop', 'workshop_title', 'category',
+            'category_name', 'category_slug', 'image', 'caption',
+            'order', 'is_featured', 'created_at',
+        ]
+

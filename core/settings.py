@@ -41,10 +41,11 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
+    (origin.strip() if origin.strip().startswith(('http://', 'https://')) else f"https://{origin.strip()}")
     for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', 'aerokodex.com,www.aerokodex.com').split(',')
     if origin.strip()
 ]
+
 
 
 # Application definition

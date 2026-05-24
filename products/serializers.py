@@ -22,7 +22,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ['id', 'variant_name', 'price', 'sku', 'stock']
+        fields = ['id', 'variant_name', 'specs', 'datasheet_url', 'price', 'sku', 'stock']
 
 
 class ProductVariantPublicSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class ProductVariantPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'variant_name', 'sku', 'stock']
+        fields = ['id', 'variant_name', 'specs', 'datasheet_url', 'sku', 'stock']
 
 
 class ProductListSerializer(serializers.ModelSerializer):

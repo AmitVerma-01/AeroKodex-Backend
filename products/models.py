@@ -31,8 +31,10 @@ class Product(models.Model):
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE)
-    variant_name = models.CharField(max_length=100, help_text="e.g. 1mm Thickness, Grade A")
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    variant_name = models.CharField(max_length=100, help_text="e.g. BhorForce® PC100")
+    specs = models.JSONField(default=dict, help_text="Per-variant specs e.g. {gsm: 100, width_mm: 1000, thickness_mm: 0.13, weave: 'Plain'}")
+    datasheet_url = models.URLField(blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
     stock = models.IntegerField(default=0)
 

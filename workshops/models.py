@@ -47,3 +47,23 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.workshop.title}"
+
+
+class WorkshopGalleryImage(models.Model):
+    title = models.CharField(max_length=200)
+    workshop = models.ForeignKey(Workshop, related_name='gallery_images', on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(WorkshopCategory, related_name='gallery_images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='workshop_gallery/')
+    caption = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+    is_featured = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = "Workshop Gallery Image"
+        verbose_name_plural = "Workshop Gallery Images"
+
+    def __str__(self):
+        return self.title
+

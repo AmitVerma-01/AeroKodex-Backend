@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import WorkshopCategory, Workshop, Booking
+from .models import WorkshopCategory, Workshop, Booking, WorkshopGalleryImage
 
 import csv
 from django.http import HttpResponse
@@ -38,8 +38,15 @@ class BookingAdmin(ExportCsvMixin, admin.ModelAdmin):
     actions = ['export_as_csv', 'send_reminder_email']
 
     def send_reminder_email(self, request, queryset):
-        # In a real scenario, this would trigger an email task
-        # e.g., send_mail(...)
         count = queryset.count()
         self.message_user(request, f"Successfully sent reminder emails to {count} attendees.")
     send_reminder_email.short_description = "Send Email Notification to Attendees"
+
+
+@admin.register(WorkshopGalleryImage)
+class WorkshopGalleryImageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'workshop', 'order', 'is_featured', 'created_at')
+    list_filter = ('category', 'workshop', 'is_featured')
+    search_fields = ('title', 'caption')
+    ordering = ('order', '-created_at')
+
