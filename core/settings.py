@@ -36,13 +36,13 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.herokuapp.com,aerokodex.com,www.aerokodex.com').split(',')
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.herokuapp.com,aerokodex.com,www.aerokodex.com,https://aerokodex-ui.com').split(',')
     if host.strip()
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     (origin.strip() if origin.strip().startswith(('http://', 'https://')) else f"https://{origin.strip()}")
-    for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', 'aerokodex.com,www.aerokodex.com').split(',')
+    for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', 'aerokodex.com,www.aerokodex.com,').split(',')
     if origin.strip()
 ]
 
