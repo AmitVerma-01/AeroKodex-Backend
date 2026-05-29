@@ -150,3 +150,21 @@ class DashboardView(APIView):
             },
             "documents": list(documents)
         })
+
+
+from rest_framework import viewsets
+from .models import Student
+from .serializers import StudentSerializer
+
+class StudentViewSet(viewsets.ModelViewSet):
+    serializer_class = StudentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role != 'SCHOOL':
+            return Student.objects.none()
+        return Student.objects.filter(school=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user)
+

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import WorkshopCategory, Workshop, Booking, WorkshopGalleryImage
+from .models import WorkshopCategory, Workshop, Booking, WorkshopGalleryImage, StudentBooking
 
 
 class WorkshopCategorySerializer(serializers.ModelSerializer):
@@ -108,4 +108,46 @@ class WorkshopGalleryImageSerializer(serializers.ModelSerializer):
             'category_name', 'category_slug', 'image', 'caption',
             'order', 'is_featured', 'created_at',
         ]
+
+
+class StudentBookingSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='student.name', read_only=True)
+    student_class = serializers.CharField(source='student.class_name', read_only=True)
+    student_email = serializers.CharField(source='student.email', read_only=True)
+    workshop_title = serializers.CharField(source='workshop.title', read_only=True)
+    workshop_date = serializers.DateTimeField(source='workshop.date', read_only=True)
+
+    class Meta:
+        model = StudentBooking
+        fields = [
+            'id', 'student', 'student_name', 'student_class', 'student_email',
+            'workshop', 'workshop_title', 'workshop_date', 'price',
+            'payment_status', 'booked_at',
+            'razorpay_order_id', 'razorpay_payment_id'
+        ]
+        read_only_fields = [
+            'id', 'student_name', 'student_class', 'student_email',
+            'workshop_title', 'workshop_date', 'price', 'payment_status',
+            'booked_at', 'razorpay_order_id', 'razorpay_payment_id'
+        ]
+
+    def validate(self, attrs):
+        school = self.context['request'].user
+        student = attrs['student']
+        workshop = attrs['workshop']
+
+        if student.school != school:
+            raise serializers.ValidationError("This student does not belong to your school.")
+
+        if not workshop.is_active:
+            raise serializers.ValidationError("This workshop is not active.")
+
+        if workshop.seats_available <= 0:
+            raise serializers.ValidationError("This workshop is fully booked.")
+
+        if StudentBooking.objects.filter(student=student, workshop=workshop).exists():
+            raise serializers.ValidationError(f"{student.name} is already registered for this workshop.")
+
+        return attrs
+
 

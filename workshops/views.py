@@ -3,7 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import WorkshopCategory, Workshop, Booking, WorkshopGalleryImage
+from .models import WorkshopCategory, Workshop, Booking, WorkshopGalleryImage, StudentBooking
 from .serializers import (
     WorkshopCategorySerializer,
     WorkshopListSerializer,
@@ -11,6 +11,7 @@ from .serializers import (
     BookingCreateSerializer,
     BookingListSerializer,
     WorkshopGalleryImageSerializer,
+    StudentBookingSerializer,
 )
 
 
@@ -84,4 +85,29 @@ class WorkshopGalleryImageView(generics.ListAPIView):
     }
     search_fields = ['title', 'caption', 'workshop__title']
     pagination_class = None
+
+
+from rest_framework import viewsets
+
+class StudentBookingViewSet(viewsets.ModelViewSet):
+    serializer_class = StudentBookingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role != 'SCHOOL':
+            return StudentBooking.objects.none()
+        return StudentBooking.objects.filter(school=self.request.user).select_related('student', 'workshop').order_by('-booked_at')
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.payment_status != 'Pending':
+            return Response(
+                {"detail": "Cannot cancel a booking that has already been paid or processed."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
+
 

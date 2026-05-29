@@ -279,7 +279,7 @@ CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         'CORS_ALLOWED_ORIGINS',
-        'http://localhost:3000,http://127.0.0.1:3000,https://aero-kodex-ui.vercel.app,https://aerokodex.com,www.aerokodex.com'
+        'http://localhost:3000,http://127.0.0.1:3000,https://aero-kodex-ui.vercel.app,https://aerokodex.com,https://www.aerokodex.com'
     ).split(',')
     if origin.strip()
 ]
@@ -301,6 +301,12 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@aerokodex.com')
+
+# ---------------------------------------------------------------------------
+# Razorpay Configuration
+# ---------------------------------------------------------------------------
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
 
 # ---------------------------------------------------------------------------
 # Caching Configuration

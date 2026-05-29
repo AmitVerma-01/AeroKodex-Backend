@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.conf import settings
 
-from .models import User, UserProfile
+from .models import User, UserProfile, Student
 
 
 # ---------------------------------------------------------------------------
@@ -17,10 +17,16 @@ from .models import User, UserProfile
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True)
+    role = serializers.CharField(required=False, default='CUSTOMER')
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'phone_number', 'password', 'password_confirm']
+        fields = ['email', 'username', 'phone_number', 'role', 'password', 'password_confirm']
+
+    def validate_role(self, value):
+        if value not in ['CUSTOMER', 'SCHOOL']:
+            raise serializers.ValidationError("Invalid role choice. You can register as Customer or School.")
+        return value
 
     def validate(self, attrs):
         if attrs['password'] != attrs.pop('password_confirm'):
@@ -33,6 +39,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             username=validated_data['username'],
             phone_number=validated_data.get('phone_number', ''),
+            role=validated_data.get('role', 'CUSTOMER'),
             password=validated_data['password'],
             otp=otp,
             is_verified=False,
@@ -208,3 +215,13 @@ class UserSerializer(serializers.ModelSerializer):
             profile.save()
 
         return instance
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    school_email = serializers.EmailField(source='school.email', read_only=True)
+
+    class Meta:
+        model = Student
+        fields = ['id', 'school_email', 'name', 'email', 'phone_number', 'class_name', 'created_at']
+        read_only_fields = ['id', 'created_at']
+

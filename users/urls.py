@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.routers import DefaultRouter
 
 from .views import (
     RegisterView,
@@ -10,9 +11,13 @@ from .views import (
     PasswordResetConfirmView,
     ProfileView,
     DashboardView,
+    StudentViewSet,
 )
 
 app_name = 'users'
+
+router = DefaultRouter()
+router.register('school/students', StudentViewSet, basename='school-students')
 
 urlpatterns = [
     # Auth
@@ -27,4 +32,8 @@ urlpatterns = [
     # Profile & Dashboard
     path('profile/', ProfileView.as_view(), name='profile'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
+
+    # School Router URLs
+    path('', include(router.urls)),
 ]
+
